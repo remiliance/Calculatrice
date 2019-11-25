@@ -1,70 +1,53 @@
-package Main;
-
-import java.awt.BorderLayout;
+package com.sdz.vue;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener; 
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-	import java.awt.*;
-	import java.awt.event.*;
-	import javax.swing.*;
-	import java.awt.BorderLayout;
-	import java.awt.Color;
-	import java.awt.Dimension;
-	import java.awt.Font;
-	import java.awt.event.ActionEvent;
-	import java.awt.event.ActionListener; 
-	import javax.swing.BorderFactory;
-	import javax.swing.JButton;
-	import javax.swing.JFrame;
-	import javax.swing.JLabel;
-	import javax.swing.JPanel;
+
+import com.sdz.model.*;
+import com.sdz.vue.*;
 
 
-public class Calculatrice extends JPanel {
-		JComboBox<String> boitecombo;
-		JLabel MaCalculette;
-		JLabel Resultat;	
-		 String[] tab_string={"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", ".", "=", "C", "+", "-", "*", "/"};
-		JFrame fen=new JFrame( );
-		Container contenu, contenu2, contenu3; 
-		String temp;
-		JPanel container = new JPanel();
-		double chiffre1=0,chiffre2=0;
-		String Operateur;
+
+import com.sdz.observer.*;
+
+public class VueCalc extends JFrame implements Observer{
+		public JComboBox<String> boitecombo;
+		public JLabel MaCalculette;
+		public JLabel Resultat;	
+		public String[] tab_string={"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", ".", "=", "C", "+", "-", "*", "/"};
+		public JFrame fen =new JFrame( );
+		public Container contenu, contenu2, contenu3; 
+		public String temp;
+		public JPanel container = new JPanel();
+		public String Operateur;
 		double result=0;
+		CalculetteControler calc;
 		
-		public Calculatrice()
+		public VueCalc(CalculetteControler calc)
 		{
+			this.calc=calc;
+			this.fen.setSize(540,560);
+			this.fen.setTitle("Ma calculatrice!");
+			this.fen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			this.fen.setLocationRelativeTo(null);
+			this. fen.setResizable(false);
 			Resultat = new JLabel("0");
-			AffichageCalculatrice();
-		}
-		
-		private void AffichageCalculatrice( ) 
-		{
-			fen.setSize(540, 560);
-			fen.setTitle("Ma calculatrice!");
-			fen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			fen.setLocationRelativeTo(null);
-		    fen.setResizable(false);
-		   
 			//On définit la police d'écriture à utiliser et résultat à 0 par défaut
 		    Font police = new Font("Arial", Font.BOLD, 20);
-		   
 		    Resultat.setFont(police);
 		    //On aligne les informations à droite dans le JLabel
 		    Resultat.setHorizontalAlignment(JLabel.RIGHT);
-		    Resultat.setPreferredSize(new Dimension(200, 20));
-		    
-		    //Cadre noir   
-		    // JPanel chiffre = new JPanel();
-		    //chiffre.setPreferredSize(new Dimension(15, 25));
 		    JPanel panEcran = new JPanel();
 		    panEcran.setPreferredSize(new Dimension(200, 30));
 		    panEcran.add(Resultat);
@@ -110,39 +93,27 @@ public class Calculatrice extends JPanel {
 		        	contenu.add(tab_button[i]);
 		        	tab_button[i].addActionListener(new Chiffre());
 		          break;
-		      }
-		        
-		    }		    	
-					  
+		      } 
+		    }
+	  
 			contenu.setLayout(new FlowLayout( ));
 			 fen.setVisible(true);
 		}
-		
+
 		public class Chiffre implements ActionListener{
 			public void actionPerformed(ActionEvent e)
 			{    
 			    Object valeur=((JButton)e.getSource()).getText();
 				String temp=(String) valeur;
-				if (chiffre1==-1)
-					chiffre1=Double.parseDouble(temp);
-				else
-					chiffre2=Double.parseDouble(temp);
-				Resultat.setText(temp);	
-				System.out.println("chiffre1");
-				System.out.println(chiffre1);
-				System.out.println("chiffre2");
-				System.out.println(chiffre2);
+				calc.setChiffre(temp);
+				//Resultat.setText(temp);
 			}
 		}
 		
 		public class Reset implements ActionListener{
 			public void actionPerformed(ActionEvent arg0)
 			{
-				chiffre1=-1;
-				chiffre2=-1;		
-				result=-1;
-				System.out.println(chiffre1);
-				System.out.println(chiffre2);
+				calc.reset();
 			}
 		}
 		
@@ -151,25 +122,21 @@ public class Calculatrice extends JPanel {
 			{
 				Object valeur=((JButton)e.getSource()).getText();
 				Operateur=(String) valeur;
-				Resultat.setText(Operateur);	
+				calc.setOperateur("+");
+				//Resultat.setText(Operateur);	
 			}
 			}
 		
 		public class Egal implements ActionListener{
 			public void actionPerformed(ActionEvent arg0)
 			{
-				if (Operateur=="+")
-				{result=chiffre1+chiffre2;
-				//Resultat.setText(result);
-				System.out.println(result);
-				System.out.println("oui");
+				calc.calcul();
 				}
-				
-				//result=-1;
-				//chiffre1=-1;
-				//chiffre2=-1;
 			}
-			
-			}
+		
+		public void update(String str1)
+		{
+			Resultat.setText(str1);
+		}
 		
 	}
